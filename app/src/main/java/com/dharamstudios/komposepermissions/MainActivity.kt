@@ -15,9 +15,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dharamstudios.komposepermissions.ui.theme.KomposePermissionsTheme
-import com.dharamstudios.permissioncore.PermissionState
 import com.dharamstudios.permissioncore.rememberPermissionState
 
 class MainActivity : ComponentActivity() {
@@ -25,12 +28,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            var showSomething by remember {
+                mutableStateOf(false)
+            }
             KomposePermissionsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val permissionState = rememberPermissionState(
                         permission = Manifest.permission.POST_NOTIFICATIONS,
                         onPermissionGranted = {
                             //Probably Use snackBar
+                            showSomething = true
                         }
                     ) {
                         AlertDialog(
@@ -69,6 +76,9 @@ class MainActivity : ComponentActivity() {
                             }
                         ) {
                             Text("Request Permission")
+                        }
+                        if (showSomething) {
+                            Text("Showing something")
                         }
                         Text(permissionState.permissionStatus.toString())
                     }

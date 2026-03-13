@@ -64,7 +64,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.DharamStudios"
                 artifactId = "kompose-permissions"
-                version = "0.1.0"
+                version = "0.1.1"
             }
         }
     }

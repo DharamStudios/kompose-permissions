@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.dharamstudios.permissioncore.internal.MutablePermissionState
 
 @Composable
@@ -40,6 +42,18 @@ fun rememberPermissionState(
         }
     )
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(
+        lifecycleOwner
+    ) {
+        val observer = LifecycleEventObserver { _, _->
+            permissionState.refreshStatus()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     DisposableEffect(permissionState, permissionLauncher) {
         permissionState.launchAction = {
             permissionLauncher.launch(permission)
@@ -50,7 +64,7 @@ fun rememberPermissionState(
     }
 
 
-    if (isRationaleVisible) {
+    if (isRationaleVisible && permissionState.permissionStatus !is PermissionStatus.Granted) {
         rationaleContent(permissionState)
     }
     return permissionState
